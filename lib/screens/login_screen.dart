@@ -4,9 +4,9 @@ import 'home_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  final VoidCallback onLogin; // <-- Add this line
+  final VoidCallback onLogin; // Needed to update parent on successful login
 
-  const LoginScreen({Key? key, required this.onLogin}) : super(key: key); // <-- Add onLogin here
+  const LoginScreen({Key? key, required this.onLogin}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -34,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (error == null) {
-      widget.onLogin(); // <--- Notify parent for navigation or state update
+      widget.onLogin(); // Notify parent for navigation or token check
     } else {
       setState(() {
         _error = error;
@@ -112,7 +112,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => const RegisterScreen()),
+                              builder: (_) =>
+                                  RegisterScreen(onLogin: widget.onLogin),
+                            ),
                           );
                         },
                   child: const Text("Don't have an account? Register"),
