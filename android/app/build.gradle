@@ -1,28 +1,19 @@
 plugins {
-    id "com.android.application" version "8.1.0"
-    id "org.jetbrains.kotlin.android" version "1.9.0"
-    id "dev.flutter.flutter-gradle-plugin"
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.flutter.gradle'
 }
 
 android {
-    namespace "com.example.ipa_testing_github_action"
-    compileSdkVersion 34
+    namespace "com.example.yourapp"
+    compileSdkVersion 33
 
     defaultConfig {
-        applicationId "com.example.ipa_testing_github_action"
+        applicationId "com.example.yourapp"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
     }
 
     buildTypes {
@@ -35,5 +26,3 @@ android {
 flutter {
     source '../..'
 }
-
-dependencies {}
