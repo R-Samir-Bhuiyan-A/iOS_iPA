@@ -41,7 +41,7 @@ jobs:
           flutter clean
 
       - name: Build APK release
-        run: flutter build apk --release --project-dir=temp_app
+        run: flutter build apk --release 
 
       - name: Upload APK to GitHub Release
         uses: softprops/action-gh-release@v1
