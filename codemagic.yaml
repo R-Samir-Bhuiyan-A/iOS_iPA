@@ -13,7 +13,7 @@ scripts:
     - name: Build AAB with Flutter
       script: | 
         flutter build apk --debug
-  artifacts:
+artifacts:
     - build/**/outputs/**/*.apk
     - build/**/outputs/**/mapping.txt
     - flutter_drive.log        
