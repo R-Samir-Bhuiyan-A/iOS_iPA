@@ -25,12 +25,12 @@ jobs:
           mv pubspec.yaml backup/
           mv pubspec.lock backup/ || true
 
-      - name: 🧼 Delete all Flutter project files
+      - name: 🧼 Delete all Flutter project files except .git and backup
         run: |
           find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name 'backup' -exec rm -rf {} +
 
-      - name: ♻️ Create fresh Flutter app
-        run: flutter create .
+      - name: ♻️ Create fresh Flutter app with valid project name
+        run: flutter create --org com.example --project-name ios_ipa .
 
       - name: 🔁 Restore Dart code and assets
         run: |
@@ -40,10 +40,10 @@ jobs:
           mv backup/pubspec.yaml ./
           mv backup/pubspec.lock ./ || true
 
-      - name: 🧹 Clean up
+      - name: 🧹 Clean up backup folder
         run: rm -rf backup
 
       - name: ✅ Commit fixed project
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "♻️ Fully rebuilt Flutter project structure"
+          commit_message: "♻️ Fully rebuilt Flutter project structure with valid package name"
