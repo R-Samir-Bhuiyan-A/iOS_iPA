@@ -39,7 +39,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        MaterialPageRoute(
+  builder: (_) => RegisterScreen(onLogin: widget.onLogin),
+),
       );
     } else {
       setState(() {
