@@ -1,0 +1,34 @@
+name: 🛠️ Fix Flutter Project
+
+on:
+  workflow_dispatch:
+
+jobs:
+  regenerate:
+    name: 🔄 Recreate Android Project
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔄 Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: 🚀 Set Up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: 🧼 Delete old android/ folder
+        run: rm -rf android
+
+      - name: ♻️ Recreate Flutter project in temp dir
+        run: flutter create -t app temp_app
+
+      - name: 📁 Copy new android folder to project
+        run: cp -r temp_app/android ./android
+
+      - name: 🧹 Clean up temp folder
+        run: rm -rf temp_app
+
+      - name: ✅ Commit the new android project
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🚑 Recreated Android folder for Gradle compatibility"
