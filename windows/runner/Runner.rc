@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "ipa_testing_github_action" "\0"
+            VALUE "FileDescription", "ios_ipa" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "ipa_testing_github_action" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "ipa_testing_github_action.exe" "\0"
-            VALUE "ProductName", "ipa_testing_github_action" "\0"
+            VALUE "InternalName", "ios_ipa" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
+            VALUE "OriginalFilename", "ios_ipa.exe" "\0"
+            VALUE "ProductName", "ios_ipa" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

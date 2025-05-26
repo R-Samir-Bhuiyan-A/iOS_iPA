@@ -1,6 +1,6 @@
 {
-    "name": "ipa_testing_github_action",
-    "short_name": "ipa_testing_github_action",
+    "name": "ios_ipa",
+    "short_name": "ios_ipa",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

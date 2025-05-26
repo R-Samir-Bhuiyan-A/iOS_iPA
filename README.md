@@ -1,15 +1,16 @@
-# Flutter iOS IPA Build: No Apple Developer Account or MacBook Needed! 100% FREE • FLUTTER Tutorial
-### [Watch on YouTube](https://youtu.be/mQMy12Sk0xM)
-[![Main](https://img.youtube.com/vi/mQMy12Sk0xM/0.jpg)](https://www.youtube.com/watch?v=mQMy12Sk0xM)
+# ios_ipa
 
+A new Flutter project.
 
+## Getting Started
 
-## This link allows you to support me, and I appreciate your help:
-* [SUPPORT](https://www.buymeacoffee.com/AmirBayat)
+This project is a starting point for a Flutter application.
 
-## My Socials:
-* [INSTAGRAM](https://www.instagram.com/codewithflexz)
-* [YOUTUBE]( https://www.youtube.com/c/ProgrammingWithFlexZ)
-* [CONTACT ME](https://amirbayat.dev@gmail.com)
-* [FIND MORE](https://zaap.bio/CodeWithFlexz)
+A few resources to get you started if this is your first Flutter project:
 
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
