@@ -1,0 +1,40 @@
+name: Android-apk-build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    name: 🤖 Android APK Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔄 Checkout Source Code
+        uses: actions/checkout@v3
+
+      - name: 🚀 Set Up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      - name: 🔨 Build APK (Release)
+        run: flutter build apk --release
+
+      - name: 🏷️ Create GitHub Release (if not exists)
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📤 Upload APK to GitHub Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/app/outputs/flutter-apk/app-release.apk
+          tag: v1.0
+          overwrite: true
+          body: "This is the first release of Shawer App 🎉"
