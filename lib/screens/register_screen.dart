@@ -1,10 +1,11 @@
-// lib/screens/register_screen.dart
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  final VoidCallback onLogin;
+
+  const RegisterScreen({Key? key, required this.onLogin}) : super(key: key);
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -32,17 +33,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
 
     if (error == null) {
-      // Registration success: navigate to login screen
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration successful! Please login.')),
+      // Auto-login after registration
+      final loginError = await ApiService.login(
+        _usernameController.text.trim(),
+        _passwordController.text.trim(),
       );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-  builder: (_) => RegisterScreen(onLogin: widget.onLogin),
-),
-      );
+
+      if (loginError == null) {
+        widget.onLogin(); // Notify main.dart of success
+      } else {
+        setState(() {
+          _error = loginError;
+          _loading = false;
+        });
+      }
     } else {
       setState(() {
         _error = error;
@@ -70,7 +74,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               children: [
                 Text(
-                  'Create an Account',
+                  'Create Account',
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 const SizedBox(height: 24),
@@ -120,7 +124,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => const LoginScreen()),
+                              builder: (_) => LoginScreen(
+                                onLogin: widget.onLogin,
+                              ),
+                            ),
                           );
                         },
                   child: const Text("Already have an account? Login"),
