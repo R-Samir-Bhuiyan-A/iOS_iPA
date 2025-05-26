@@ -1,0 +1,49 @@
+name: 🛠️ Fully Rebuild Flutter Project with Android
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fix-project:
+    name: ♻️ Rebuild Full Flutter Project
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔄 Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: 🚀 Set Up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: 🏗️ Backup important folders
+        run: |
+          mkdir backup
+          mv lib backup/
+          mv assets backup/ || true
+          mv pubspec.yaml backup/
+          mv pubspec.lock backup/ || true
+
+      - name: 🧼 Delete all Flutter project files
+        run: |
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name 'backup' -exec rm -rf {} +
+
+      - name: ♻️ Create fresh Flutter app
+        run: flutter create .
+
+      - name: 🔁 Restore Dart code and assets
+        run: |
+          rm -rf lib
+          mv backup/lib ./
+          mv backup/assets ./ || true
+          mv backup/pubspec.yaml ./
+          mv backup/pubspec.lock ./ || true
+
+      - name: 🧹 Clean up
+        run: rm -rf backup
+
+      - name: ✅ Commit fixed project
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "♻️ Fully rebuilt Flutter project structure"
