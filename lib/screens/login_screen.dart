@@ -1,11 +1,12 @@
-// lib/screens/login_screen.dart
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  final VoidCallback onLogin; // <-- Add this line
+
+  const LoginScreen({Key? key, required this.onLogin}) : super(key: key); // <-- Add onLogin here
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -33,12 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (error == null) {
-      // Login success: navigate to Home
-      if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
+      widget.onLogin(); // <--- Notify parent for navigation or state update
     } else {
       setState(() {
         _error = error;
