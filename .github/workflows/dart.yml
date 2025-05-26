@@ -7,36 +7,51 @@ jobs:
   build-ios:
     name: 🎉 iOS Build
     runs-on: macos-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: 🔄 Checkout Source Code
+        uses: actions/checkout@v3
 
-      - uses: subosito/flutter-action@v2
+      - name: 🚀 Set Up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: stable
           architecture: x64
-      - run: flutter pub get
-      
 
-      - run: pod repo update
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      - name: 📦 CocoaPods Repo Update
+        run: pod repo update
         working-directory: ios
 
-      - run: flutter build ios --release --no-codesign
+      - name: 🔨 Build iOS (No Codesign)
+        run: flutter build ios --release --no-codesign
 
-      - run: mkdir Payload
+      - name: 📁 Create Payload Directory
+        run: mkdir Payload
         working-directory: build/ios/iphoneos
 
-      - run: mv Runner.app/ Payload
+      - name: 📁 Move App to Payload
+        run: mv Runner.app Payload/
         working-directory: build/ios/iphoneos
 
-      - name: Zip output
+      - name: 📦 Create IPA File
         run: zip -qq -r -9 FlutterIpaExport.ipa Payload
         working-directory: build/ios/iphoneos
 
-      - name: Upload binaries to release
+      - name: 🏷️ Create GitHub Release (if not exists)
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📤 Upload IPA to GitHub Release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/ios/iphoneos/FlutterIpaExport.ipa
           tag: v1.0
           overwrite: true
-          body: "This is first release"
+          body: "This is the first release of Shawer App 🎉"
