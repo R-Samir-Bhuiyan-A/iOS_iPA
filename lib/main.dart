@@ -1,4 +1,3 @@
-// lib/main.dart
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
@@ -33,6 +32,15 @@ class _ShawarAppState extends State<ShawarApp> {
     });
   }
 
+  void _onLoginSuccess() async {
+    final token = await TokenStorage.getToken();
+    setState(() => _token = token);
+  }
+
+  void _onLogout() {
+    setState(() => _token = null);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
@@ -42,6 +50,7 @@ class _ShawarAppState extends State<ShawarApp> {
         ),
       );
     }
+
     return MaterialApp(
       title: 'Shawar Slang App',
       theme: ThemeData(
@@ -50,7 +59,9 @@ class _ShawarAppState extends State<ShawarApp> {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: _token == null ? const LoginScreen() : const HomeScreen(),
+      home: _token == null
+          ? LoginScreen(onLogin: _onLoginSuccess)
+          : HomeScreen(onLogout: _onLogout),
     );
   }
 }
