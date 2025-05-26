@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = 'ipa_testing_github_action'  // or whatever your project name is
+rootProject.name = 'ipa_testing_github_action'
 include ':app'
