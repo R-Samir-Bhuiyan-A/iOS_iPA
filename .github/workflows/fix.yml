@@ -1,14 +1,15 @@
-name: 🛠️ Fix Flutter Project
+name: 🛠️ Migrate to Android v2 Embedding
 
 on:
   workflow_dispatch:
 
 jobs:
-  regenerate:
-    name: 🔄 Recreate Android Project
+  migrate:
+    name: 🔄 Fix Android Embedding
     runs-on: ubuntu-latest
+
     steps:
-      - name: 🔄 Checkout Repo
+      - name: 📥 Checkout Project
         uses: actions/checkout@v3
 
       - name: 🚀 Set Up Flutter
@@ -19,16 +20,16 @@ jobs:
       - name: 🧼 Delete old android/ folder
         run: rm -rf android
 
-      - name: ♻️ Recreate Flutter project in temp dir
-        run: flutter create -t app temp_app
+      - name: 🛠️ Create new Flutter project to extract Android v2
+        run: flutter create temp_app
 
-      - name: 📁 Copy new android folder to project
+      - name: 🔁 Copy android/ from fresh app
         run: cp -r temp_app/android ./android
 
-      - name: 🧹 Clean up temp folder
+      - name: 🧹 Remove temp app
         run: rm -rf temp_app
 
-      - name: ✅ Commit the new android project
+      - name: 📝 Commit migration
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "🚑 Recreated Android folder for Gradle compatibility"
+          commit_message: "🚀 Migrated Android project to embedding v2"
