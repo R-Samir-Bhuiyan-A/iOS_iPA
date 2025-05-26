@@ -1,11 +1,14 @@
-name: Android-apk-build
+name: Android-apk-build 🚀
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - 'v*.*.*' # triggers on version tags like v1.0.0
 
 jobs:
   build-android:
-    name: 🤖 Android APK Build
+    name: 🤖 Build Android APK
     runs-on: ubuntu-latest
 
     steps:
@@ -15,10 +18,17 @@ jobs:
       - name: 🚀 Set Up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.19.6'
           channel: stable
+
+      - name: 🔧 Enable Executable Permission on gradlew
+        run: chmod +x android/gradlew
 
       - name: 📦 Install Dependencies
         run: flutter pub get
+
+      - name: 🧹 Clean Project
+        run: flutter clean
 
       - name: 🔨 Build APK (Release)
         run: flutter build apk --release
@@ -26,7 +36,7 @@ jobs:
       - name: 🏷️ Create GitHub Release (if not exists)
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v1.0
+          tag_name: ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -35,6 +45,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/app/outputs/flutter-apk/app-release.apk
-          tag: v1.0
+          asset_name: Shawer-App-v${{ github.ref_name }}.apk
+          tag: ${{ github.ref_name }}
           overwrite: true
-          body: "This is the first release of Shawer App 🎉"
+          body: "📱 Shawer Android Release v${{ github.ref_name }} 🎉"
