@@ -1,0 +1,61 @@
+name: 🛠️ Rebuild Flutter Project & Build APK
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*.*.*'  # version tags like v1.0.0
+
+jobs:
+  rebuild-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.6'
+          channel: stable
+
+      - name: Create fresh Flutter app in temp dir
+        run: flutter create -t app temp_app
+
+      - name: Copy your Dart code, assets, and configs to temp app
+        run: |
+          rm -rf temp_app/lib temp_app/assets temp_app/pubspec.yaml temp_app/pubspec.lock || true
+          cp -r lib temp_app/
+          cp -r assets temp_app/ || true
+          cp pubspec.yaml temp_app/
+          cp pubspec.lock temp_app/ || true
+
+      - name: Move to temp app folder
+        run: cd temp_app
+
+      - name: Get dependencies and clean
+        run: |
+          cd temp_app
+          flutter pub get
+          flutter clean
+
+      - name: Build APK release
+        run: flutter build apk --release --project-dir=temp_app
+
+      - name: Upload APK to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload APK file
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: temp_app/build/app/outputs/flutter-apk/app-release.apk
+          asset_name: Shawer-App-v${{ github.ref_name }}.apk
+          tag: ${{ github.ref_name }}
+          overwrite: true
+          body: "📱 Shawer Android Release v${{ github.ref_name }} 🎉"
