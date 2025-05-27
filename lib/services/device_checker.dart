@@ -14,8 +14,12 @@ class DeviceChecker {
 
     if (Platform.isAndroid) {
       final android = await deviceInfo.androidInfo;
-      deviceId = android.id ?? android.androidId ?? 'unknown';
+      deviceId = android.id ?? 'unknown'; // ✅ Only use `.id`
       os = 'Android ${android.version.release}';
+    } else if (Platform.isIOS) {
+      final ios = await deviceInfo.iosInfo;
+      deviceId = ios.identifierForVendor ?? 'unknown';
+      os = '${ios.systemName} ${ios.systemVersion}';
     }
 
     // Get public IP
