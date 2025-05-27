@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/block_screen.dart'; // 👈 Add this
 import 'utils/token_storage.dart';
+import 'services/device_checker.dart'; // 👈 Add this
 
 void main() {
   runApp(const ShawarApp());
@@ -17,14 +19,29 @@ class ShawarApp extends StatefulWidget {
 class _ShawarAppState extends State<ShawarApp> {
   String? _token;
   bool _loading = true;
+  bool _allowed = true;
+  String? _blockMessage;
+  String? _blockLink;
 
   @override
   void initState() {
     super.initState();
-    _checkToken();
+    _checkAccessAndToken();
   }
 
-  Future<void> _checkToken() async {
+  Future<void> _checkAccessAndToken() async {
+    final access = await DeviceChecker.isAllowed();
+
+    if (!access['allow']) {
+      setState(() {
+        _allowed = false;
+        _blockMessage = access['message'];
+        _blockLink = access['link'];
+        _loading = false;
+      });
+      return;
+    }
+
     final token = await TokenStorage.getToken();
     setState(() {
       _token = token;
@@ -51,8 +68,18 @@ class _ShawarAppState extends State<ShawarApp> {
       );
     }
 
+    if (!_allowed) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: BlockScreen(
+          message: _blockMessage ?? "App access is blocked by admin.",
+          link: _blockLink,
+        ),
+      );
+    }
+
     return MaterialApp(
-      title: 'Shawar Slang App',
+      title: 'Shawar App',
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
         brightness: Brightness.dark,
