@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-ios:
-    name: 🎉 iOS Build & Update Dependencies
+    name: 🎉 iOS Build & Update Dependencie
     runs-on: macos-latest
 
     steps:
