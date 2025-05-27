@@ -2,168 +2,309 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-void main() => runApp(const ShawerApp());
+const String adminApiBase = 'http://103.151.60.203/slg/admin/admin.php';
 
-class ShawerApp extends StatelessWidget {
-  const ShawerApp({super.key});
+void main() {
+  runApp(AdminPanelApp());
+}
+
+class AdminPanelApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Shawer App',
-      home: HomePage(),
+    return MaterialApp(
+      title: 'SLG Admin Panel',
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: Color(0xFF121212),
+        cardColor: Color(0xFF1E1E1E),
+        accentColor: Colors.tealAccent,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(primary: Colors.tealAccent),
+        ),
+      ),
+      home: AdminPanelScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class AdminPanelScreen extends StatefulWidget {
   @override
-  State<HomePage> createState() => _HomePageState();
+  _AdminPanelScreenState createState() => _AdminPanelScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
-  final apiUrl = "http://103.151.60.203/slg/api.php";
-  String username = '';
-  String password = '';
-  String session = '';
-  int points = 0;
-  String newSlang = '';
-  List slangs = [];
-  String message = '';
+class _AdminPanelScreenState extends State<AdminPanelScreen> {
+  List<Map<String, dynamic>> devices = [];
   bool isLoading = false;
-  bool isLoggedIn = false;
+  bool globalPause = false;
+  String pauseMessage = '';
+  String pauseLink = '';
+  String error = '';
 
-  Future<void> auth(String action) async {
-    setState(() => isLoading = true);
-    final response = await http.post(Uri.parse(apiUrl), body: {
-      'action': action,
-      'username': username,
-      'password': password,
-    });
-
-    final data = jsonDecode(response.body);
-    if (data['success']) {
-      setState(() {
-        session = data['session'] ?? '';
-        points = data['points'] ?? 0;
-        isLoggedIn = true;
-        message = 'Welcome, $username';
-        loadSlangs();
-      });
-    } else {
-      setState(() => message = data['error'] ?? 'Auth failed');
-    }
-    setState(() => isLoading = false);
+  @override
+  void initState() {
+    super.initState();
+    fetchDevices();
+    fetchGlobalPauseStatus();
   }
 
-  Future<void> loadSlangs() async {
-    final response = await http.post(Uri.parse(apiUrl), body: {
-      'action': 'feed',
-      'session': session,
-    });
-
-    final data = jsonDecode(response.body);
+  Future<void> fetchDevices() async {
     setState(() {
-      slangs = data['slangs'] ?? [];
-      points = data['points'] ?? points;
+      isLoading = true;
+      error = '';
+    });
+    try {
+      final res = await http.get(Uri.parse('$adminApiBase?action=list'));
+      if (res.statusCode == 200) {
+        final data = json.decode(res.body) as Map<String, dynamic>? ?? {};
+        // The API returns devices as a map, convert to list of devices with id
+        if (data.isEmpty) {
+          devices = [];
+        } else {
+          devices = data.entries
+              .map((e) => {
+                    "device_id": e.key,
+                    ...Map<String, dynamic>.from(e.value),
+                  })
+              .toList();
+        }
+      } else {
+        error = 'Failed to load devices: ${res.statusCode}';
+      }
+    } catch (e) {
+      error = 'Failed to load devices: $e';
+    }
+    setState(() {
+      isLoading = false;
     });
   }
 
-  Future<void> submitSlang() async {
-    if (newSlang.isEmpty) return;
-    final response = await http.post(Uri.parse(apiUrl), body: {
-      'action': 'submit',
-      'session': session,
-      'text': newSlang,
-    });
-    final data = jsonDecode(response.body);
-    if (data['success']) {
-      setState(() {
-        newSlang = '';
-        message = 'Slang submitted!';
-        loadSlangs();
-      });
+  Future<void> fetchGlobalPauseStatus() async {
+    // We get global pause status by fetching devices first (they come with global_pause inside rules.json)
+    try {
+      final res = await http.get(Uri.parse('$adminApiBase?action=list'));
+      if (res.statusCode == 200) {
+        // The response only returns devices; we need another way:
+        // So let's fetch rules.json directly (assuming you allow that)
+        final rulesRes =
+            await http.get(Uri.parse('http://103.151.60.203/slg/admin/rules.json'));
+        if (rulesRes.statusCode == 200) {
+          final rulesData = json.decode(rulesRes.body);
+          setState(() {
+            globalPause = rulesData['global_pause'] ?? false;
+            pauseMessage = rulesData['pause_message'] ?? '';
+            pauseLink = rulesData['pause_link'] ?? '';
+          });
+        }
+      }
+    } catch (_) {
+      // ignore errors for now
+    }
+  }
+
+  Future<void> blockDevice(String deviceId, String message) async {
+    final uri = Uri.parse(
+        '$adminApiBase?action=block&device_id=${Uri.encodeComponent(deviceId)}&message=${Uri.encodeComponent(message)}');
+    final res = await http.get(uri);
+    if (res.statusCode == 200) {
+      final data = json.decode(res.body);
+      if (data['status'] == 'blocked') {
+        _showSnack('Device blocked successfully');
+        fetchDevices();
+      } else if (data['error'] != null) {
+        _showSnack('Error: ${data['error']}');
+      }
     } else {
-      setState(() => message = data['error'] ?? 'Submit failed');
+      _showSnack('Failed to block device');
     }
   }
 
-  Future<void> voteSlang(String id, String voteType) async {
-    final response = await http.post(Uri.parse(apiUrl), body: {
-      'action': 'vote',
-      'session': session,
-      'id': id,
-      'vote': voteType,
-    });
-
-    final data = jsonDecode(response.body);
-    if (data['success']) {
-      loadSlangs();
+  Future<void> unblockDevice(String deviceId) async {
+    final uri =
+        Uri.parse('$adminApiBase?action=unblock&device_id=${Uri.encodeComponent(deviceId)}');
+    final res = await http.get(uri);
+    if (res.statusCode == 200) {
+      final data = json.decode(res.body);
+      if (data['status'] == 'unblocked') {
+        _showSnack('Device unblocked successfully');
+        fetchDevices();
+      } else if (data['error'] != null) {
+        _showSnack('Error: ${data['error']}');
+      }
+    } else {
+      _showSnack('Failed to unblock device');
     }
   }
 
-  Widget buildAuthScreen() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Text('Shawer App', style: TextStyle(fontSize: 30)),
-        const SizedBox(height: 20),
-        TextField(
-          decoration: const InputDecoration(labelText: 'Username'),
-          onChanged: (v) => username = v,
-        ),
-        TextField(
-          obscureText: true,
-          decoration: const InputDecoration(labelText: 'Password'),
-          onChanged: (v) => password = v,
-        ),
-        const SizedBox(height: 10),
-        ElevatedButton(
-            onPressed: () => auth('login'), child: const Text('Login')),
-        ElevatedButton(
-            onPressed: () => auth('register'), child: const Text('Register')),
-        const SizedBox(height: 10),
-        if (message.isNotEmpty)
-          Text(message, style: const TextStyle(color: Colors.red)),
-      ],
+  Future<void> toggleGlobalPause(bool pause, String message, String link) async {
+    final uri = Uri.parse(
+        '$adminApiBase?action=pause_all&status=${pause ? '1' : '0'}&message=${Uri.encodeComponent(message)}&link=${Uri.encodeComponent(link)}');
+    final res = await http.get(uri);
+    if (res.statusCode == 200) {
+      final data = json.decode(res.body);
+      if (data['status'] == 'paused_all' || data['status'] == 'resumed_all') {
+        _showSnack('Global pause updated');
+        fetchGlobalPauseStatus();
+      } else if (data['error'] != null) {
+        _showSnack('Error: ${data['error']}');
+      }
+    } else {
+      _showSnack('Failed to update global pause');
+    }
+  }
+
+  void _showSnack(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg)),
     );
   }
 
-  Widget buildMainScreen() {
-    return RefreshIndicator(
-      onRefresh: loadSlangs,
-      child: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Text('Hi $username 👋 – Points: $points', style: const TextStyle(fontSize: 18)),
-          const SizedBox(height: 10),
-          TextField(
-            decoration: const InputDecoration(hintText: 'Write a new slang...'),
-            onChanged: (v) => newSlang = v,
-            onSubmitted: (_) => submitSlang(),
+  void _showBlockDialog(String deviceId) {
+    final controller = TextEditingController(text: "Your device has been blocked by admin.");
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: Color(0xFF222222),
+        title: Text('Block Device', style: TextStyle(color: Colors.white)),
+        content: TextField(
+          controller: controller,
+          maxLines: 3,
+          style: TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            labelText: 'Block Message',
+            labelStyle: TextStyle(color: Colors.tealAccent),
+            border: OutlineInputBorder(),
           ),
-          const SizedBox(height: 10),
-          ElevatedButton(onPressed: submitSlang, child: const Text('Submit Slang')),
-          const Divider(),
-          const Text('Recent Slangs:', style: TextStyle(fontSize: 18)),
-          for (var slang in slangs)
-            Card(
-              child: ListTile(
-                title: Text(slang['text']),
-                subtitle: Text("Votes: ${slang['votes']}"),
-                trailing: Wrap(
-                  children: [
-                    IconButton(
-                        icon: const Icon(Icons.thumb_up),
-                        onPressed: () => voteSlang(slang['id'], 'up')),
-                    IconButton(
-                        icon: const Icon(Icons.thumb_down),
-                        onPressed: () => voteSlang(slang['id'], 'down')),
-                  ],
+        ),
+        actions: [
+          TextButton(
+            child: Text('Cancel', style: TextStyle(color: Colors.tealAccent)),
+            onPressed: () => Navigator.pop(context),
+          ),
+          ElevatedButton(
+            child: Text('Block'),
+            onPressed: () {
+              blockDevice(deviceId, controller.text.trim());
+              Navigator.pop(context);
+            },
+          )
+        ],
+      ),
+    );
+  }
+
+  void _showGlobalPauseDialog() {
+    final msgController = TextEditingController(text: pauseMessage);
+    final linkController = TextEditingController(text: pauseLink);
+    bool isPaused = globalPause;
+
+    showDialog(
+      context: context,
+      builder: (_) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            backgroundColor: Color(0xFF222222),
+            title: Text('Global Pause Settings', style: TextStyle(color: Colors.white)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SwitchListTile(
+                  value: isPaused,
+                  onChanged: (v) => setDialogState(() => isPaused = v),
+                  title: Text('Pause All Access', style: TextStyle(color: Colors.white)),
                 ),
+                TextField(
+                  controller: msgController,
+                  maxLines: 3,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Pause Message',
+                    labelStyle: TextStyle(color: Colors.tealAccent),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: linkController,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Pause Link (optional)',
+                    labelStyle: TextStyle(color: Colors.tealAccent),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                child: Text('Cancel', style: TextStyle(color: Colors.tealAccent)),
+                onPressed: () => Navigator.pop(context),
               ),
-            )
+              ElevatedButton(
+                child: Text('Save'),
+                onPressed: () {
+                  toggleGlobalPause(isPaused, msgController.text.trim(), linkController.text.trim());
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget deviceCard(Map<String, dynamic> device) {
+    final bool blocked = device['blocked'] == true;
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+      child: ExpansionTile(
+        tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        title: Text(
+          device['device_id'] ?? 'Unknown ID',
+          style: TextStyle(
+              color: blocked ? Colors.redAccent : Colors.tealAccent,
+              fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          blocked ? 'Blocked' : 'Active',
+          style: TextStyle(color: blocked ? Colors.redAccent : Colors.greenAccent),
+        ),
+        children: [
+          ListTile(
+            title: Text('IP: ${device['ip'] ?? 'N/A'}'),
+          ),
+          ListTile(
+            title: Text('OS: ${device['os'] ?? 'N/A'}'),
+          ),
+          ListTile(
+            title: Text('App Version: ${device['version'] ?? 'N/A'}'),
+          ),
+          ListTile(
+            title: Text('Last Active: ${device['last_active'] ?? 'N/A'}'),
+          ),
+          if (blocked)
+            ListTile(
+              title: Text(
+                'Block Message:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(device['block_message'] ?? 'No message'),
+            ),
+          ButtonBar(
+            children: [
+              if (!blocked)
+                ElevatedButton(
+                  onPressed: () => _showBlockDialog(device['device_id']),
+                  child: Text('Block'),
+                ),
+              if (blocked)
+                ElevatedButton(
+                  onPressed: () => unblockDevice(device['device_id']),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.greenAccent),
+                  child: Text('Unblock', style: TextStyle(color: Colors.black)),
+                ),
+            ],
+          ),
         ],
       ),
     );
@@ -172,12 +313,34 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('SLG Admin Panel'),
+        actions: [
+          IconButton(
+            tooltip: 'Global Pause Settings',
+            icon: Icon(Icons.pause_circle),
+            onPressed: _showGlobalPauseDialog,
+          ),
+          IconButton(
+            tooltip: 'Refresh Devices',
+            icon: Icon(Icons.refresh),
+            onPressed: fetchDevices,
+          ),
+        ],
+      ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(20),
-              child: isLoggedIn ? buildMainScreen() : buildAuthScreen(),
-            ),
+          ? Center(child: CircularProgressIndicator())
+          : error.isNotEmpty
+              ? Center(child: Text(error, style: TextStyle(color: Colors.red)))
+              : devices.isEmpty
+                  ? Center(child: Text('No devices found', style: TextStyle(color: Colors.white70)))
+                  : RefreshIndicator(
+                      onRefresh: fetchDevices,
+                      child: ListView.builder(
+                        itemCount: devices.length,
+                        itemBuilder: (_, i) => deviceCard(devices[i]),
+                      ),
+                    ),
     );
   }
 }
