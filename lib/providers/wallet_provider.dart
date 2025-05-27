@@ -7,7 +7,7 @@ class WalletProvider with ChangeNotifier {
   List<Deposit> deposits = [];
 
   Future<void> fetchBalance() async {
-    final res = await ApiService.post('/wallet/balance.php');
+    final res = await ApiService.post('/wallet/balance.php', {});  // <-- add empty map here
     if (res['status'] == 'success') {
       balance = res['data']['balance'];
       notifyListeners();
