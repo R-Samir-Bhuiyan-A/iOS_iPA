@@ -18,7 +18,7 @@ class AdminPanelApp extends StatelessWidget {
         cardColor: Color(0xFF1E1E1E),
         accentColor: Colors.tealAccent,
         elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(primary: Colors.tealAccent),
+          ElevatedButton.styleFrom(backgroundColor: Colors.tealAccent),
         ),
       ),
       home: AdminPanelScreen(),
