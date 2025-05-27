@@ -74,6 +74,18 @@ Technically, there’s just one guy. But we don't do "normal" here 😎
 
 ---
 
+### Shawar app offers 
+
+| Category                    | Description                                               |
+|-----------------------------|-----------------------------------------------------------|
+| Bullying Comments           | Slang phrases that are aggressive or harassing            |
+| Harassment                 | Comments or slang promoting harassment or intimidation    |
+| Death Threats              | Slang involving threats of violence or death              |
+| Pervert Comments           | Sexual or inappropriate slang                              |
+| Objectifying Comments      | Slang that objectifies individuals                         |
+| Premium  Categories.       | like *ma boner gali* for premium  |
+
+
 ## 💡 Future Plans
 
 - Device control via dashboard  
