@@ -228,8 +228,8 @@ class _SlangCardState extends State<SlangCard> {
                     color: liked ? Colors.red : Colors.grey.shade600,
                   ),
                   onPressed: () async {
-                    await vote(liked ? 'dislike' : 'like');
-                    setState(() => liked = !liked);
+                    vote(liked ? 'dislike' : 'like');
+setState(() => liked = !liked);
                   },
                   tooltip: liked ? 'Unlike' : 'Like',
                 ),
