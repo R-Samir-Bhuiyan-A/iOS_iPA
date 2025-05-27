@@ -117,6 +117,79 @@ This project was created to:
 - Full-stack session handling
 - Easy to maintain and extend
 
+
+# Shawar Project
+
+This repository contains two main Flutter apps for the **Shawar** platform:
+
+- **Shawar App** (User-facing mobile app)
+- **Shawar Admin App** (Admin panel for managing users and devices)
+
+---
+
+## 🕹️ Shawar App (User App)
+
+The main app used by end-users to share, like, dislike, and interact with slang phrases.
+
+### Current Features
+
+| Feature                        | Status    | Description                                          |
+|-------------------------------|-----------|----------------------------------------------------|
+| User Registration & Login     | ✅ Added  | Firebase Auth for user accounts                      |
+| Slang Feed                   | ✅ Added  | View, like, dislike, edit, and delete slang posts   |
+| Slang Posting & Editing      | ✅ Added  | Create and modify slang content                       |
+| Slang Feed Moderation        | ✅ Added  | Report inappropriate slang                            |
+| Auto-login                   | ✅ Added  | Session token stored and auto-login support          |
+
+### Planned Features
+
+| Feature                      | Status    | Description                                          |
+|------------------------------|-----------|----------------------------------------------------|
+| Comments & Replies           | Planned   | Comment on slang, reply threads                      |
+| User Profile Analytics       | Planned   | Overview of user activity, likes ratio, slang stats |
+| Notifications               | Planned   | Push notifications for likes, comments, replies    |
+| Multi-language Support      | Planned   | Support for Bangla dialects and others               |
+
+---
+
+## 🛠️ Shawar Admin App (Admin Panel)
+
+Flutter app to manage users, devices, slang content, feedback, and moderation.
+
+### Current Features
+
+| Feature                      | Status    | Description                                          |
+|------------------------------|-----------|----------------------------------------------------|
+| Device Listing & Details     | ✅ Added  | View device info including IP, OS, last active time |
+| Block/Unblock Devices        | ✅ Added  | Block or unblock devices with custom messages       |
+| Global Pause Control         | ✅ Added  | Pause or resume app usage globally with custom message & link |
+| Real-time Status Updates     | ✅ Added  | Refresh device and app status live                   |
+
+### Planned Features
+
+| Feature                      | Status    | Description                                          |
+|------------------------------|-----------|----------------------------------------------------|
+| Feedback Management          | Planned   | View, pin, and respond to user feedback             |
+| Admin Chat                  | Planned   | Real-time chat between admins and moderators        |
+| User Profile Analytics      | Planned   | View user stats and activity overview                |
+| Comment Moderation          | Planned   | Manage slang comments, editing, deleting, moderating |
+| Notification System         | Planned   | Push notifications and in-app notifications center  |
+| Content Moderation & Reporting | Planned | Report review, content actions, and user banning     |
+
+---
+
+## 💡 Future Ideas (Both Apps)
+
+| Feature                      | Status    | Description                                          |
+|------------------------------|-----------|----------------------------------------------------|
+| Automated Content Moderation | Idea      | AI-powered moderation for slang and chat content   |
+| User Ranking & Leaderboards  | Idea      | Leaderboards based on user activity and likes       |
+| Analytics Dashboard         | Idea      | Visualize trends, usage stats, and moderation data  |
+| Multi-language Localization | Idea      | Support for multiple languages and dialects          |
+
+---
+
+
 ## 👨‍💻 Maintainer
 
 This entire project is created, designed, developed, and managed by many developers :
