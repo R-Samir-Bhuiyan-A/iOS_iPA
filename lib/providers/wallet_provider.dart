@@ -21,7 +21,8 @@ class WalletProvider with ChangeNotifier {
       'trx_id': trxId,
     });
     if (res['status'] == 'success') {
-      fetchDeposits();
+      await fetchDeposits();
+      notifyListeners();
     }
   }
 
@@ -31,5 +32,16 @@ class WalletProvider with ChangeNotifier {
       deposits = (res['data'] as List).map((d) => Deposit.fromJson(d)).toList();
       notifyListeners();
     }
+  }
+
+  // New: Withdraw request method
+  Future<bool> requestWithdraw(String number, int amount) async {
+    if (amount < 100) return false;
+
+    final res = await ApiService.post('/wallet/withdraw.php', {
+      'number': number,
+      'amount': amount,
+    });
+    return res['status'] == 'success';
   }
 }
