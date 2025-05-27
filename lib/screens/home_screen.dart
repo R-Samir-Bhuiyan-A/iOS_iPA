@@ -212,7 +212,7 @@ class _SlangCardState extends State<SlangCard> {
   Widget build(BuildContext context) {
     final slang = widget.slang;
     final likeCount = slang['likes'] ?? 0;
-    final postedBy = slang['posted_by'] ?? 'Unknown';
+    final postedBy = slang['author'] ?? 'Unknown';
 
     return Card(
       color: Colors.grey[850],
