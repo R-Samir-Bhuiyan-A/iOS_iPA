@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'core/theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/tournament_provider.dart';
+import 'providers/wallet_provider.dart'; // Added WalletProvider import
+
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/profile_screen.dart';
@@ -20,6 +22,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => TournamentProvider()),
+        ChangeNotifierProvider(create: (_) => WalletProvider()), // Added WalletProvider
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -64,7 +67,11 @@ class _SplashOrHomeState extends State<SplashOrHome> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (_loading) {
+      return Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return _loggedIn ? TournamentListScreen() : LoginScreen();
   }
