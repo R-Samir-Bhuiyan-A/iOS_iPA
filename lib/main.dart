@@ -5,20 +5,22 @@ import 'package:http/http.dart' as http;
 const String adminApiBase = 'http://103.151.60.203/slg/admin/admin.php';
 
 void main() {
-  runApp(AdminPanelApp());
+  runApp(ShawarAdminApp());
 }
 
-class AdminPanelApp extends StatelessWidget {
+class ShawarAdminApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SLG Admin Panel',
+      title: 'Shawar Admin',
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: Color(0xFF121212),
         cardColor: Color(0xFF1E1E1E),
-        accentColor: Colors.tealAccent,
+        colorScheme: ColorScheme.dark(
+          secondary: Colors.tealAccent,
+        ),
         elevatedButtonTheme: ElevatedButtonThemeData(
-          ElevatedButton.styleFrom(backgroundColor: Colors.tealAccent),
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.tealAccent),
         ),
       ),
       home: AdminPanelScreen(),
@@ -56,17 +58,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       final res = await http.get(Uri.parse('$adminApiBase?action=list'));
       if (res.statusCode == 200) {
         final data = json.decode(res.body) as Map<String, dynamic>? ?? {};
-        // The API returns devices as a map, convert to list of devices with id
-        if (data.isEmpty) {
-          devices = [];
-        } else {
-          devices = data.entries
-              .map((e) => {
-                    "device_id": e.key,
-                    ...Map<String, dynamic>.from(e.value),
-                  })
-              .toList();
-        }
+        devices = data.entries
+            .map((e) => {
+                  "device_id": e.key,
+                  ...Map<String, dynamic>.from(e.value),
+                })
+            .toList();
       } else {
         error = 'Failed to load devices: ${res.statusCode}';
       }
@@ -79,26 +76,17 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   }
 
   Future<void> fetchGlobalPauseStatus() async {
-    // We get global pause status by fetching devices first (they come with global_pause inside rules.json)
     try {
-      final res = await http.get(Uri.parse('$adminApiBase?action=list'));
+      final res = await http.get(Uri.parse('http://103.151.60.203/slg/admin/rules.json'));
       if (res.statusCode == 200) {
-        // The response only returns devices; we need another way:
-        // So let's fetch rules.json directly (assuming you allow that)
-        final rulesRes =
-            await http.get(Uri.parse('http://103.151.60.203/slg/admin/rules.json'));
-        if (rulesRes.statusCode == 200) {
-          final rulesData = json.decode(rulesRes.body);
-          setState(() {
-            globalPause = rulesData['global_pause'] ?? false;
-            pauseMessage = rulesData['pause_message'] ?? '';
-            pauseLink = rulesData['pause_link'] ?? '';
-          });
-        }
+        final rulesData = json.decode(res.body);
+        setState(() {
+          globalPause = rulesData['global_pause'] ?? false;
+          pauseMessage = rulesData['pause_message'] ?? '';
+          pauseLink = rulesData['pause_link'] ?? '';
+        });
       }
-    } catch (_) {
-      // ignore errors for now
-    }
+    } catch (_) {}
   }
 
   Future<void> blockDevice(String deviceId, String message) async {
@@ -242,7 +230,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
               ElevatedButton(
                 child: Text('Save'),
                 onPressed: () {
-                  toggleGlobalPause(isPaused, msgController.text.trim(), linkController.text.trim());
+                  toggleGlobalPause(
+                    isPaused,
+                    msgController.text.trim(),
+                    linkController.text.trim(),
+                  );
                   Navigator.pop(context);
                 },
               )
@@ -262,32 +254,22 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         title: Text(
           device['device_id'] ?? 'Unknown ID',
           style: TextStyle(
-              color: blocked ? Colors.redAccent : Colors.tealAccent,
-              fontWeight: FontWeight.bold),
+            color: blocked ? Colors.redAccent : Colors.tealAccent,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         subtitle: Text(
           blocked ? 'Blocked' : 'Active',
           style: TextStyle(color: blocked ? Colors.redAccent : Colors.greenAccent),
         ),
         children: [
-          ListTile(
-            title: Text('IP: ${device['ip'] ?? 'N/A'}'),
-          ),
-          ListTile(
-            title: Text('OS: ${device['os'] ?? 'N/A'}'),
-          ),
-          ListTile(
-            title: Text('App Version: ${device['version'] ?? 'N/A'}'),
-          ),
-          ListTile(
-            title: Text('Last Active: ${device['last_active'] ?? 'N/A'}'),
-          ),
+          ListTile(title: Text('IP: ${device['ip'] ?? 'N/A'}')),
+          ListTile(title: Text('OS: ${device['os'] ?? 'N/A'}')),
+          ListTile(title: Text('App Version: ${device['version'] ?? 'N/A'}')),
+          ListTile(title: Text('Last Active: ${device['last_active'] ?? 'N/A'}')),
           if (blocked)
             ListTile(
-              title: Text(
-                'Block Message:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+              title: Text('Block Message:', style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text(device['block_message'] ?? 'No message'),
             ),
           ButtonBar(
@@ -314,7 +296,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('SLG Admin Panel'),
+        title: Text('Shawar Admin'),
         actions: [
           IconButton(
             tooltip: 'Global Pause Settings',
