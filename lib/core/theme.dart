@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
   primaryColor: Colors.deepPurpleAccent,
-  accentColor: Colors.deepPurpleAccent,
-  scaffoldBackgroundColor: Color(0xFF121212),
+  colorScheme: ColorScheme.dark(
+    primary: Colors.deepPurpleAccent,
+    secondary: Colors.deepPurpleAccent,
+  ),
+  scaffoldBackgroundColor: const Color(0xFF121212),
   fontFamily: 'Roboto',
   buttonTheme: ButtonThemeData(
     buttonColor: Colors.deepPurpleAccent,
@@ -12,7 +15,7 @@ final ThemeData darkTheme = ThemeData(
   ),
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
-      primary: Colors.deepPurpleAccent,
+      foregroundColor: Colors.deepPurpleAccent, // <-- use foregroundColor instead of primary
     ),
   ),
   inputDecorationTheme: InputDecorationTheme(
