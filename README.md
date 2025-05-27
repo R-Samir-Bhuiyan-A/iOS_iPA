@@ -17,7 +17,7 @@ Your gang's dictionary – but social.
 | Platform   | Status     | Link (Coming Soon) |
 |------------|------------|--------------------|
 | iOS        | 🧪 Beta     | 🔗 TestFlight / App Store |
-| Android    | 🧪 beta.    | 🔗 Play Store        |
+| Android    | 🧪 beta.    | 🔗 [Click](https://github.com/R-Samir-Bhuiyan-A/shawar_app/releases/download/b3/shawar_app.apk)        |
 | Windows    | 🔜 planned  | 🔗 Coming Soon       |
 | macOS      | 🔜 planned  | 🔗 Coming Soon       |
 | Linux      | 🔜 Planned  | 🔗 TBD               |
