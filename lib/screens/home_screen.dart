@@ -49,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212), // dark background
+      backgroundColor: Colors.grey[900],
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: const Text('Shawa Feed', style: TextStyle(color: Colors.white)),
@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
               margin: const EdgeInsets.all(12),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey.shade900,
+                color: Colors.grey[850],
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
@@ -116,7 +116,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? const Center(child: CircularProgressIndicator(color: Colors.white))
                 : RefreshIndicator(
                     onRefresh: loadFeed,
-                    color: Colors.orangeAccent,
                     child: ListView.builder(
                       padding: const EdgeInsets.all(12),
                       itemCount: feed.length,
@@ -175,20 +174,15 @@ class _SlangCardState extends State<SlangCard> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: Colors.grey[900],
+        backgroundColor: Colors.grey[850],
         title: const Text('Edit Slang', style: TextStyle(color: Colors.white)),
         content: TextField(
           controller: controller,
           style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             hintText: 'Enter new slang',
-            hintStyle: TextStyle(color: Colors.grey.shade500),
-            enabledBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.orangeAccent),
-            ),
-            focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.orangeAccent),
-            ),
+            hintStyle: TextStyle(color: Colors.grey),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
           ),
         ),
         actions: [
@@ -204,12 +198,11 @@ class _SlangCardState extends State<SlangCard> {
                 widget.onRefresh();
               }
             },
-            child: const Text('Save', style: TextStyle(color: Colors.orangeAccent)),
+            child: const Text('Save'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.white70)),
-          ),
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
         ],
       ),
     );
@@ -219,10 +212,10 @@ class _SlangCardState extends State<SlangCard> {
   Widget build(BuildContext context) {
     final slang = widget.slang;
     final likeCount = slang['likes'] ?? 0;
-    final poster = slang['posted_by'] ?? 'Unknown';
+    final postedBy = slang['posted_by'] ?? 'Unknown';
 
     return Card(
-      color: const Color(0xFF1E1E1E),
+      color: Colors.grey[850],
       elevation: 4,
       margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -233,28 +226,20 @@ class _SlangCardState extends State<SlangCard> {
           children: [
             Text(
               slang['text'] ?? '',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
             ),
             const SizedBox(height: 8),
             Text(
-              'Posted by: $poster',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.orangeAccent.shade200,
-                fontStyle: FontStyle.italic,
-              ),
+              'Posted by: $postedBy',
+              style: TextStyle(color: Colors.grey[400], fontSize: 12),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Row(
               children: [
                 IconButton(
                   icon: Icon(
                     liked ? Icons.favorite : Icons.favorite_border,
-                    color: liked ? Colors.redAccent : Colors.grey.shade400,
+                    color: liked ? Colors.redAccent : Colors.grey[400],
                   ),
                   onPressed: () {
                     vote(liked ? 'dislike' : 'like');
@@ -264,7 +249,7 @@ class _SlangCardState extends State<SlangCard> {
                 ),
                 Text(
                   '$likeCount',
-                  style: TextStyle(color: Colors.grey.shade400),
+                  style: TextStyle(color: Colors.grey[400]),
                 ),
                 const Spacer(),
                 PopupMenuButton<String>(
@@ -286,7 +271,7 @@ class _SlangCardState extends State<SlangCard> {
                     const PopupMenuItem(value: 'edit', child: Text('Edit')),
                     const PopupMenuItem(value: 'delete', child: Text('Delete')),
                   ],
-                  icon: Icon(Icons.more_vert, color: Colors.grey.shade400),
+                  icon: Icon(Icons.more_vert, color: Colors.grey[400]),
                 ),
               ],
             ),
