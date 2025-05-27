@@ -189,16 +189,16 @@ class _SlangCardState extends State<_SlangCard> with SingleTickerProviderStateMi
     await _animController.forward();
     await _animController.reverse();
 
-    final success = await ApiService.likeSlang(widget.slang['id'], !_liked);
-    if (success == null) {
+    final action = _liked ? 'dislike' : 'like';
+    final err = await ApiService.voteSlang(widget.slang['id'], action);
+
+    if (err == null) {
       setState(() {
         _liked = !_liked;
-        widget.onRefresh();
       });
+      widget.onRefresh();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $success')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $err')));
     }
 
     setState(() => _isLiking = false);
@@ -254,7 +254,6 @@ class _SlangCardState extends State<_SlangCard> with SingleTickerProviderStateMi
                 PopupMenuButton<String>(
                   icon: Icon(Icons.more_vert, color: Colors.grey.shade700),
                   onSelected: (value) {
-                    // Add more options here if needed
                     if (value == 'report') {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Reported. Thank you!')),
