@@ -32,10 +32,11 @@ dependencies:
     sdk: flutter 
   shared_preferences: ^2.2.1
   cupertino_icons: ^1.0.6
-  device_info_plus: ^9.1.1
-  package_info_plus: ^5.0.1
-  http: ^1.2.1
+  device_info_plus: ^
   flutter_secure_storage: ^9.0.0
+  package_info_plus: ^8.3.0
+  http: ^1.2.1
+  # your other dependencies...
 
 
   # The following adds the Cupertino Icons font to your application.
