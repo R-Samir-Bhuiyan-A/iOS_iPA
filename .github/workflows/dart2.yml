@@ -1,0 +1,98 @@
+name: iOS-ipa-build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: 🎉 iOS Build & Update Dependencies
+    runs-on: macos-latest
+
+    steps:
+      - name: 🔄 Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: 🚀 Set Up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          architecture: x64
+
+      - name: 📦 Upgrade Dependencies (updates pubspec.lock)
+        run: flutter pub upgrade
+
+      - name: 🔁 Commit and Push updated pubspec.lock if changed
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add pubspec.lock
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update pubspec.lock via CI"
+            git push
+          else
+            echo "No changes in pubspec.lock"
+          fi
+
+      - name: 🚿 Update CocoaPods repo
+        run: pod repo update
+        working-directory: ios
+
+      - name: 🏗 Build iOS Release (no codesign)
+        run: flutter build ios --release --no-codesign
+
+      - name: 📦 Prepare IPA structure
+        run: mkdir Payload
+        working-directory: build/ios/iphoneos
+
+      - name: 📂 Move app to Payload
+        run: mv Runner.app/ Payload
+        working-directory: build/ios/iphoneos
+
+      - name: 🗜 Zip IPA
+        run: zip -qq -r -9 FlutterIpaExport.ipa Payload
+        working-directory: build/ios/iphoneos
+
+      - name: 🔍 Get latest release tag
+        id: get_latest_tag
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const releases = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 1,
+              page: 1
+            });
+            if (releases.data.length === 0) {
+              return "v0.0";
+            }
+            return releases.data[0].tag_name;
+
+      - name: 🔢 Increment version tag
+        id: increment_version
+        run: |
+          latest_tag=${{ steps.get_latest_tag.outputs.result }}
+          echo "Latest tag is $latest_tag"
+          # Extract numeric parts from tag vX.Y format
+          version=${latest_tag#v}
+          major=${version%%.*}
+          minor=${version#*.}
+          if ! [[ "$major" =~ ^[0-9]+$ ]]; then
+            major=0
+          fi
+          if ! [[ "$minor" =~ ^[0-9]+$ ]]; then
+            minor=0
+          fi
+          # Increment major version by 1, reset minor to 0
+          new_major=$((major + 1))
+          new_tag="v${new_major}.0"
+          echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
+
+      - name: 📤 Upload IPA to GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.increment_version.outputs.new_tag }}
+          name: Release ${{ steps.increment_version.outputs.new_tag }}
+          body: "Automatically released version ${{ steps.increment_version.outputs.new_tag }}"
+          files: build/ios/iphoneos/FlutterIpaExport.ipa
