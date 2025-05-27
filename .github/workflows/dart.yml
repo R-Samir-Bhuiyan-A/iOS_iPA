@@ -1,51 +1,62 @@
-name: 🚀 Android APK Build
+name: iOS-ipa-build
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*.*.*' # e.g., v1.0.0
 
 jobs:
-  build-android:
-    name: 🤖 Build Android APK
-    runs-on: ubuntu-latest
+  build-ios:
+    name: 🎉 iOS Build & Update Dependencies
+    runs-on: macos-latest
 
     steps:
-      - name: 🔄 Checkout Source Code
+      - name: 🔄 Checkout Repo
         uses: actions/checkout@v3
 
       - name: 🚀 Set Up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6'
           channel: stable
+          architecture: x64
 
-      - name: 🚀 Upgrade all dependencies
-        run: flutter pub upgrade --major-versions
+      - name: 📦 Upgrade Dependencies (updates pubspec.lock)
+        run: flutter pub upgrade
 
-      - name: 📦 Install Dependencies
-        run: flutter pub get
+      - name: 🔁 Commit and Push updated pubspec.lock if changed
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add pubspec.lock
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update pubspec.lock via CI"
+            git push
+          else
+            echo "No changes in pubspec.lock"
+          fi
 
-      - name: 🧹 Clean Project
-        run: flutter clean
+      - name: 🚿 Update CocoaPods repo
+        run: pod repo update
+        working-directory: ios
 
-      - name: 🔨 Build APK (Release)
-        run: flutter build apk --release
+      - name: 🏗 Build iOS Release (no codesign)
+        run: flutter build ios --release --no-codesign
 
-      - name: 🏷️ Create GitHub Release (if not exists)
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 📦 Prepare IPA structure
+        run: mkdir Payload
+        working-directory: build/ios/iphoneos
 
-      - name: 📤 Upload APK to GitHub Release
+      - name: 📂 Move app to Payload
+        run: mv Runner.app/ Payload
+        working-directory: build/ios/iphoneos
+
+      - name: 🗜 Zip IPA
+        run: zip -qq -r -9 FlutterIpaExport.ipa Payload
+        working-directory: build/ios/iphoneos
+
+      - name: 📤 Upload IPA to GitHub Release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: build/app/outputs/flutter-apk/app-release.apk
-          asset_name: Shawer-App-v${{ github.ref_name }}.apk
-          tag: ${{ github.ref_name }}
+          file: build/ios/iphoneos/FlutterIpaExport.ipa
+          tag: v1.0
           overwrite: true
-          body: "📱 Shawer Android Release v${{ github.ref_name }} 🎉"
+          body: "This is first release"
