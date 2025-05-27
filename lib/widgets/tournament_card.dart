@@ -10,7 +10,7 @@ class TournamentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final userId = authProvider.userId;
+    final userId = authProvider.userId; // ✅ Correct usage here
 
     return Card(
       color: Colors.grey[850],
@@ -46,7 +46,7 @@ class TournamentCard extends StatelessWidget {
               ],
             ),
 
-            // Room Reveal UI: Show room id and password only if tournament started and user joined
+            // Room Reveal UI
             if (tournament.status == 'started' && tournament.joinedUsers.contains(userId)) ...[
               SizedBox(height: 12),
               Divider(color: Colors.white38),
