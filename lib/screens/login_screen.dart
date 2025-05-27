@@ -52,21 +52,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
-      backgroundColor: Colors.deepPurple.shade900,
+      backgroundColor: Colors.black,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Card(
-            elevation: 10,
+            elevation: 8,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(20),
             ),
-            color: Colors.white,
+            color: const Color(0xFF1E1E1E), // Dark grey card
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 28),
+              padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 28),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -74,23 +72,30 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Text(
                       'Login to Shawar App',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple.shade700,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    const Divider(thickness: 1),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
+                    Divider(color: Colors.grey.shade700),
+                    const SizedBox(height: 24),
 
                     // Username
                     TextFormField(
                       controller: _usernameController,
-                      decoration: const InputDecoration(
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
                         labelText: 'Username',
+                        labelStyle: TextStyle(color: Colors.grey.shade400),
                         border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.person),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey.shade600),
+                        ),
+                        prefixIcon: const Icon(Icons.person, color: Colors.white70),
+                        fillColor: const Color(0xFF2A2A2A),
+                        filled: true,
                       ),
                       validator: (val) =>
                           val == null || val.isEmpty ? 'Enter username' : null,
@@ -100,21 +105,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     // Password
                     TextFormField(
                       controller: _passwordController,
-                      decoration: const InputDecoration(
-                        labelText: 'Password',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.lock),
-                      ),
                       obscureText: true,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: TextStyle(color: Colors.grey.shade400),
+                        border: OutlineInputBorder(),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey.shade600),
+                        ),
+                        prefixIcon: const Icon(Icons.lock, color: Colors.white70),
+                        fillColor: const Color(0xFF2A2A2A),
+                        filled: true,
+                      ),
                       validator: (val) =>
                           val == null || val.isEmpty ? 'Enter password' : null,
                     ),
 
-                    // Error
+                    // Error message
                     if (_error != null) ...[
                       const SizedBox(height: 12),
-                      Text(_error!,
-                          style: const TextStyle(color: Colors.red)),
+                      Text(
+                        _error!,
+                        style: const TextStyle(color: Colors.redAccent),
+                      ),
                     ],
 
                     const SizedBox(height: 24),
@@ -125,7 +139,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: ElevatedButton(
                         onPressed: _loading ? null : _login,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple,
+                          backgroundColor: Colors.grey.shade800,
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -163,8 +178,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               );
                             },
                       child: const Text(
-                        "Don't have an Shawar account? Register",
-                        style: TextStyle(color: Colors.deepPurple),
+                        "Don't have a Shawar account? Register",
+                        style: TextStyle(color: Colors.white70),
                       ),
                     ),
                   ],
