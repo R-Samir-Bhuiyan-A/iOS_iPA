@@ -1,42 +1,51 @@
-name: iOS-ipa-build
+name: 🚀 Android APK Build
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - 'v*.*.*' # e.g., v1.0.0
 
 jobs:
-  build-ios:
-    name: 🎉 iOS Build
-    runs-on: macos-latest
+  build-android:
+    name: 🤖 Build Android APK
+    runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: 🔄 Checkout Source Code
+        uses: actions/checkout@v3
 
-      - uses: subosito/flutter-action@v2
+      - name: 🚀 Set Up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          architecture: x64
-      - run: flutter pub get
-      
+          flutter-version: '3.19.6'
+          channel: stable
 
-      - run: pod repo update
-        working-directory: ios
+      - name: 🚀 Upgrade all dependencies
+        run: flutter pub upgrade --major-versions
 
-      - run: flutter build ios --release --no-codesign
+      - name: 📦 Install Dependencies
+        run: flutter pub get
 
-      - run: mkdir Payload
-        working-directory: build/ios/iphoneos
+      - name: 🧹 Clean Project
+        run: flutter clean
 
-      - run: mv Runner.app/ Payload
-        working-directory: build/ios/iphoneos
+      - name: 🔨 Build APK (Release)
+        run: flutter build apk --release
 
-      - name: Zip output
-        run: zip -qq -r -9 FlutterIpaExport.ipa Payload
-        working-directory: build/ios/iphoneos
+      - name: 🏷️ Create GitHub Release (if not exists)
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload binaries to release
+      - name: 📤 Upload APK to GitHub Release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: build/ios/iphoneos/FlutterIpaExport.ipa
-          tag: v1.0
+          file: build/app/outputs/flutter-apk/app-release.apk
+          asset_name: Shawer-App-v${{ github.ref_name }}.apk
+          tag: ${{ github.ref_name }}
           overwrite: true
-          body: "This is first release"
+          body: "📱 Shawer Android Release v${{ github.ref_name }} 🎉"
