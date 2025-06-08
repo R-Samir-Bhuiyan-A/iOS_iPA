@@ -50,44 +50,44 @@
 ---
 `
 lib/
-│
-├── core/
-│   ├── api_service.dart           # API interaction & remote JSON fetch
-│   ├── error_handler.dart         # Global error handling utilities
-│   ├── state_manager.dart         # Basic state management logic (e.g. Provider)
-│   ├── theme_manager.dart         # Dynamic theming, color schemes
-│   ├── routing_manager.dart       # JSON-driven routing & navigation
-│   └── utils.dart                 # Helper functions (color parsing, json utils)
-│
-├── modules/
-│   ├── layouts.dart               # Layout builder (Column, Row, Container, etc.)
-│   ├── contents.dart              # Content renderer (Text, Images, Icons, etc.)
-│   ├── placeholders.dart          # Placeholder parsing & dynamic content injection
-│   ├── actions.dart               # UI Actions (tap, long press, API calls)
-│   ├── design.dart                # Styling (fonts, margins, borders, shadows)
-│   ├── theming.dart               # Theme data & runtime theme switching
-│   ├── routing.dart               # Route definitions & guards
-│   ├── forms.dart                 # Dynamic form builder & validation
-│   ├── error_widgets.dart         # UI for showing errors & fallback widgets
-│   └── plugins.dart               # Support for external plugins/extensions
-│
-├── screens/
-│   ├── home_screen.dart           # Main screen rendering dynamic UI
-│   ├── settings_screen.dart       # App settings (API URL change, theme, etc.)
-│   └── error_screen.dart          # Error fallback screen
-│
-├── models/
-│   ├── ui_definition.dart         # Data model for UI JSON definitions
-│   ├── app_state.dart             # App-wide state models (user, theme, config)
-│   └── api_response.dart          # Models for API responses
-│
-├── widgets/
-│   ├── dynamic_widget.dart        # Base widget that delegates building to modules
-│   ├── loading_indicator.dart     # Loading spinner widget
-│   └── common_widgets.dart        # Shared reusable widgets (buttons, cards)
-│
-├── main.dart                     # Entry point linking everything together
-└── constants.dart                # App constants (colors, keys, routes)
+|
++-- core/
+|   +-- api_service.dart           # API interaction & remote JSON fetch
+|   +-- error_handler.dart         # Global error handling utilities
+|   +-- state_manager.dart         # Basic state management logic (e.g. Provider)
+|   +-- theme_manager.dart         # Dynamic theming, color schemes
+|   +-- routing_manager.dart       # JSON-driven routing & navigation
+|   +-- utils.dart                 # Helper functions (color parsing, json utils)
+|
++-- modules/
+|   +-- layouts.dart               # Layout builder (Column, Row, Container, etc.)
+|   +-- contents.dart              # Content renderer (Text, Images, Icons, etc.)
+|   +-- placeholders.dart          # Placeholder parsing & dynamic content injection
+|   +-- actions.dart               # UI Actions (tap, long press, API calls)
+|   +-- design.dart                # Styling (fonts, margins, borders, shadows)
+|   +-- theming.dart               # Theme data & runtime theme switching
+|   +-- routing.dart               # Route definitions & guards
+|   +-- forms.dart                 # Dynamic form builder & validation
+|   +-- error_widgets.dart         # UI for showing errors & fallback widgets
+|   +-- plugins.dart               # Support for external plugins/extensions
+|
++-- screens/
+|   +-- home_screen.dart           # Main screen rendering dynamic UI
+|   +-- settings_screen.dart       # App settings (API URL change, theme, etc.)
+|   +-- error_screen.dart          # Error fallback screen
+|
++-- models/
+|   +-- ui_definition.dart         # Data model for UI JSON definitions
+|   +-- app_state.dart             # App-wide state models (user, theme, config)
+|   +-- api_response.dart          # Models for API responses
+|
++-- widgets/
+|   +-- dynamic_widget.dart        # Base widget that delegates building to modules
+|   +-- loading_indicator.dart     # Loading spinner widget
+|   +-- common_widgets.dart        # Shared reusable widgets (buttons, cards)
+|
++-- main.dart                     # Entry point linking everything together
++-- constants.dart                # App constants (colors, keys, routes)
 `
 
 
