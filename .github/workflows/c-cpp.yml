@@ -1,61 +1,62 @@
-name: 🛠️ Rebuild Flutter Project & Build APK
+name: iOS-ipa-build
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*.*.*'  # version tags like v1.0.0
 
 jobs:
-  rebuild-and-build:
-    runs-on: ubuntu-latest
+  build-ios:
+    name: 🎉 iOS Build & Update Dependencies
+    runs-on: macos-latest
 
     steps:
-      - name: Checkout Repo
+      - name: 🔄 Checkout Repo
         uses: actions/checkout@v3
 
-      - name: Setup Flutter
+      - name: 🚀 Set Up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6'
           channel: stable
+          architecture: x64
 
-      - name: Create fresh Flutter app in temp dir
-        run: flutter create -t app temp_app
+      - name: 📦 Upgrade Dependencies (updates pubspec.lock)
+        run: flutter pub upgrade
 
-      - name: Copy your Dart code, assets, and configs to temp app
+      - name: 🔁 Commit and Push updated pubspec.lock if changed
         run: |
-          rm -rf temp_app/lib temp_app/assets temp_app/pubspec.yaml temp_app/pubspec.lock || true
-          cp -r lib temp_app/
-          cp -r assets temp_app/ || true
-          cp pubspec.yaml temp_app/
-          cp pubspec.lock temp_app/ || true
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add pubspec.lock
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update pubspec.lock via CI"
+            git push
+          else
+            echo "No changes in pubspec.lock"
+          fi
 
-      - name: Move to temp app folder
-        run: cd temp_app
+      - name: 🚿 Update CocoaPods repo
+        run: pod repo update
+        working-directory: ios
 
-      - name: Get dependencies and clean
-        run: |
-          cd temp_app
-          flutter pub get
-          flutter clean
+      - name: 🏗 Build iOS Release (no codesign)
+        run: flutter build ios --release --no-codesign
 
-      - name: Build APK release
-        run: flutter build apk --release 
+      - name: 📦 Prepare IPA structure
+        run: mkdir Payload
+        working-directory: build/ios/iphoneos
 
-      - name: Upload APK to GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 📂 Move app to Payload
+        run: mv Runner.app/ Payload
+        working-directory: build/ios/iphoneos
 
-      - name: Upload APK file
+      - name: 🗜 Zip IPA
+        run: zip -qq -r -9 FlutterIpaExport.ipa Payload
+        working-directory: build/ios/iphoneos
+
+      - name: 📤 Upload IPA to GitHub Release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: temp_app/build/app/outputs/flutter-apk/app-release.apk
-          asset_name: Shawer-App-v${{ github.ref_name }}.apk
-          tag: ${{ github.ref_name }}
+          file: build/ios/iphoneos/FlutterIpaExport.ipa
+          tag: v1.0
           overwrite: true
-          body: "📱 Shawer Android Release v${{ github.ref_name }} 🎉"
+          body: "This is first release"
