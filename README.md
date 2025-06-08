@@ -50,7 +50,7 @@
 ---
 
 <pre markdown="1">
-```markdown
+
 lib/
 ├── core/
 │   ├── api_service.dart           # API interaction & remote JSON fetch
@@ -84,7 +84,6 @@ lib/
 │   └── common_widgets.dart        # Shared reusable widgets (buttons, cards)
 ├── main.dart                     # Entry point linking everything together
 └── constants.dart                # App constants (colors, keys, routes)
-```
 </pre>
 
 
