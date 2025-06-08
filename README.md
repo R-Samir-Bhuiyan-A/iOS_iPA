@@ -48,6 +48,7 @@
 | **Error & Loading States** | Animated error messages and loading spinners | ![Error Loading](https://user-images.githubusercontent.com/your-repo/animations/error-loading.gif) |
 
 ---
+`
 lib/
 │
 ├── core/
@@ -87,6 +88,7 @@ lib/
 │
 ├── main.dart                     # Entry point linking everything together
 └── constants.dart                # App constants (colors, keys, routes)
+`
 
 
 ## 🌟 Core Features & Roadmap
